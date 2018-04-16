@@ -34,16 +34,22 @@ open class CollectionViewDataSource: NSObject, UICollectionViewDataSource {
     }
 
     open func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let dataGridDataSource = dataGridView.dataSource else {
-            fatalError("dataGridView.dataSource unexpectedly nil")
+        let defaultCell = UICollectionViewCell()
+        
+        guard let dataGridDataSource = dataGridView?.dataSource else {
+            return defaultCell
         }
+        
         if let cell = dataGridDataSource.dataGridView?(dataGridView, cellForItemAtIndexPath: indexPath) {
             return cell
         } else {
-            let cell = dataGridView.dequeueReusableCellWithReuseIdentifier(DataGridView.ReuseIdentifiers.defaultCell, forIndexPath: indexPath) as! DataGridViewContentCell
+            guard let cell = dataGridView?.dequeueReusableCellWithReuseIdentifier(DataGridView.ReuseIdentifiers.defaultCell, forIndexPath: indexPath) as? DataGridViewContentCell else {
+                return defaultCell
+            }
             cell.textLabel.text = dataGridDataSource.dataGridView?(dataGridView, textForCellAtIndexPath: indexPath) ?? ""
             return cell
         }
+        return defaultCell
     }
 
     open func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
